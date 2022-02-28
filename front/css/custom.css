@@ -1,0 +1,15 @@
+#colors.error {
+  border: 5px solid red;
+}
+
+#colors {
+  border: 1px solid #000;
+}
+
+#quantity.error {
+  border: 5px solid red;
+}
+
+#quantity {
+  border: 1px solid #000;
+}
