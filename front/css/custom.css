@@ -13,3 +13,86 @@
 #quantity {
   border: 1px solid #000;
 }
+
+/* modal */
+
+
+.open-modal {
+  opacity: 0;
+  border: solid 2px #000;
+  width: 150px;
+  height: 121px;
+  position: absolute;
+  cursor: pointer;
+  top: 23%;
+  margin-left: 42px;
+  transition: opacity 0.4s ease-out;
+}
+
+.modal-container {
+  visibility: hidden;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.overlay {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #333333d3;
+  transition: opacity 0.4s 0.2s ease-out;
+}
+
+.modal-container.active {
+  visibility: visible;
+}
+
+.modal-container.active .overlay {
+  opacity: 1;
+  transition: opacity 0.4s ease-out;
+}
+
+.modal-container.active .modal {
+  opacity: 1;
+  transition: opacity 0.4s 0.2s ease-out,
+    transform 0.4s 0.2s ease-out;
+  transform: translate(-50%, -50%);
+}
+
+.modal {
+  opacity: 0;
+  width: 95%;
+  max-width: 400px;
+  min-width: 300px;
+  padding: 50px;
+  background: #fff;
+  border-radius: 5px;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% - 50px));
+  transition: opacity 0.4s ease-out,
+    transform 0.4s ease-out;
+}
+
+.modal p {
+  color: #000;
+  text-align: center;
+}
+
+
+.close-modal {
+  padding: 4px 7px;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  cursor: pointer;
+  background: #ff365e;
+  color: #fff;
+}

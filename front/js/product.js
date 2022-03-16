@@ -1,10 +1,43 @@
 let cart = [];
+let timeoutId = 0;
+const addToCart=document.getElementById('addToCart');
 
 // 1 - Récupérer l'id dans l'url d'appel
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get('id');
-const addToCart=document.getElementById('addToCart');
+
+// Préparation d'une modal pour les messages d'avertissement
+
+let body = document.body;
+
+let modalContainer = document.createElement('div');
+modalContainer.setAttribute('class','modal-container');
+body.prepend(modalContainer);
+
+let overlay = document.createElement('div');
+overlay.setAttribute('class','overlay ');
+modalContainer.insertAdjacentElement('beforeend',overlay);
+
+let modal = document.createElement('div');
+modal.setAttribute('class','modal');
+modalContainer.insertAdjacentElement('beforeend',modal);
+
+let button = document.createElement('button');
+button.setAttribute('class','close-modal')
+button.textContent = 'X';
+modal.insertAdjacentElement('beforeend',button);
+
+let text = document.createElement('p');
+text.setAttribute('class', 'text');
+modal.insertAdjacentElement('beforeend',text);
+
+const modalClose = document.querySelector('.close-modal');
+modalClose.addEventListener("click",() => {
+    clearTimeout(timeoutId);
+    modalContainer.classList.toggle("active");
+});
+
 
 // 2 - Charger ce produit en appelant l'Api /:id
 let productData;
@@ -22,11 +55,9 @@ const productDisplay = async () =>{
     document.getElementById("price").innerHTML= `${productData.price}`
     document.getElementById("description").innerHTML= `${productData.description}`
     document.getElementById("colors").innerHTML = `<option value="">--SVP, choisissez une couleur --</option>`;
-    document.getElementById("colors").innerHTML += productData.colors.map((color) =>
-    `
-    <option value="${color}">${color}</option>
-
-    `).join("");
+    for(let color of productData.colors){
+        document.getElementById("colors").innerHTML += `<option value="${color}">${color}</option>`
+    }
 };
 
 productDisplay();
@@ -35,8 +66,8 @@ productDisplay();
 addToCart.addEventListener("click",() => {
 
 // Initialisation des éléments DOM
-let colorsElement = document.getElementById("colors");
-let qtyElement = document.getElementById('quantity');
+const colorsElement = document.getElementById("colors");
+const qtyElement = document.getElementById('quantity');
 let qty = qtyElement.value;
 
 // Validation du formulaire produit
@@ -98,9 +129,11 @@ if(!error)
             cart.push(productData);
             sessionStorage.setItem('cart',JSON.stringify(cart))
         }
-
-        alert(`Votre commande de ${productData.qty} ${productData.name} ${productData.selectedColor} a bien été ajouté à votre panier`);
-
+        text.textContent=`Votre commande de ${productData.qty} ${productData.name} ${productData.selectedColor} a bien été ajouté à votre panier`;
+        modalContainer.classList.toggle("active");
+        timeoutId=setTimeout(() =>{
+            modalContainer.classList.toggle("active");
+        },5000)
     }
     else
     {
@@ -109,7 +142,11 @@ if(!error)
         cart.push(productData);
         sessionStorage.setItem('cart',JSON.stringify(cart))
         
-        alert(`Votre commande de ${productData.qty} ${productData.name} ${productData.selectedColor} a bien été ajouté à votre panier`);
+        text.textContent=`Votre commande de ${productData.qty} ${productData.name} ${productData.selectedColor} a bien été ajouté à votre panier`;
+        modalContainer.classList.toggle("active");
+        timeoutId=setTimeout(() =>{
+            modalContainer.classList.toggle("active");
+        },5000)
     }
 
 
@@ -117,7 +154,9 @@ if(!error)
     resetSelectValue('colors');     // On pointe sur la valeur par défaut du Select
 }
 
+
 });  //  End listener
+
 
 function getSelectValue(selectId)
 {

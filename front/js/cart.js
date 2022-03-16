@@ -18,9 +18,9 @@ let firstName, lastName, address, city, email;
 const form = document.querySelector("form");
 
 // 2 - Je map le panier
-if(cart===null){
+if(cart===null || cart.length == 0){
     document.querySelector('h1').textContent += " est vide !"
-}else {
+}else { 
     cart.map((product) => {
     
     // cumul du prix pour le total de la commande
@@ -57,8 +57,75 @@ if(cart===null){
     `
     }).join("");
 
+    // for (let product of cart){
+
+    //     // cumul du prix pour le total de la commande
+    //     total += product.price * product.qty;
+    //     total_qty += parseInt(product.qty);
+    //     products.push(product);
+    
+    //     items.innerHTML += 
+    //     `
+    //     <article class="cart__item" data-id="${product._id}" data-color="${product.selectedColor}">
+    //         <div class="cart__item__img">
+    //             <img src="${product.imageUrl}" alt="${product.altTxt}">
+    //         </div
+    //         <div class="cart__item__content">
+    
+    //             <div class="cart__item__content__description">
+    //                 <h2>${product.name}</h2>
+    //                 <p>${product.selectedColor}</p>
+    //                 <p>${product.price} €</p>
+    //             </div>
+    
+    //             <div class="cart__item__content__settings">
+    //                 <div class="cart__item__content__settings__quantity">
+    //                     <p>Qté : </p>
+    //                     <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.qty}">
+    //                 </div>
+    //                 <div class="cart__item__content__settings__delete">
+    //                     <p class="deleteItem">Supprimer</p>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </article>
+    //     `
+    // }
+
 } // End Map
 
+
+// Préparation d'une modal pour les messages d'avertissement
+
+let body = document.body;
+let timeoutId = 0;
+
+let modalContainer = document.createElement('div');
+modalContainer.setAttribute('class','modal-container');
+body.prepend(modalContainer);
+
+let overlay = document.createElement('div');
+overlay.setAttribute('class','overlay ');
+modalContainer.insertAdjacentElement('beforeend',overlay);
+
+let modal = document.createElement('div');
+modal.setAttribute('class','modal');
+modalContainer.insertAdjacentElement('beforeend',modal);
+
+let button = document.createElement('button');
+button.setAttribute('class','close-modal')
+button.textContent = 'X';
+modal.insertAdjacentElement('beforeend',button);
+
+let text = document.createElement('p');
+text.setAttribute('class', 'text');
+modal.insertAdjacentElement('beforeend',text);
+
+const modalClose = document.querySelector('.close-modal');
+modalClose.addEventListener("click",() => {
+    clearTimeout(timeoutId);
+    modalContainer.classList.toggle("active");
+});
 
 // 3 - Je mets à jours total et qty après mapping
 totalPrice.innerHTML=total;
@@ -69,6 +136,7 @@ totalQuantity.innerHTML=total_qty;
 items.addEventListener('click', (e) => {
     e.preventDefault();
     let res = []
+    let validAction=false;
 
     switch(e.target.className)
     {
@@ -84,6 +152,8 @@ items.addEventListener('click', (e) => {
 
             // On supprime la ligne de l'article dans l'affichage du panier
             res.node.style.display='none';
+
+            validAction=true;
 
         break;
 
@@ -114,23 +184,28 @@ items.addEventListener('click', (e) => {
 
             store(products); // On met à jour le sessionStorage
 
+            validAction=true;
+
         break;
     }
 
     // On met à jour les champs nombre d'articles et prix total de la commande
-    total = total + (res.prix * new_qty);
-    total_qty = total_qty + new_qty;           
-    totalPrice.innerHTML=total;
-    totalQuantity.innerHTML=total_qty;
+    if(validAction)
+    {
+        total = total + (res.prix * new_qty);
+        total_qty = total_qty + new_qty;           
+        totalPrice.innerHTML=total;
+        totalQuantity.innerHTML=total_qty;
+    }
+
 });
 
 function store(products)
 {
-    let rows=[];
-    products.map((o) => {
-        rows.push(o)
-    } )
-    sessionStorage.setItem("cart", JSON.stringify(rows));
+    // Permet de mettre à jour le panier en cours dans le sessionStorage
+    sessionStorage.setItem("cart", JSON.stringify(products));
+    if(products===null || products.length == 0)
+        document.querySelector('h1').textContent += " est vide !";
 };
 
 
@@ -173,11 +248,28 @@ function getPath(e)
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-        // je récupère les id des produits que je push dans un tableau.
-        let products = [];
-        for (let i = 0; i<cart.length;i++) {
-            products.push(cart[i]._id);
+    cart = JSON.parse(sessionStorage.getItem('cart'));
+        if (cart === null || cart.length == 0)
+        {
+            text.textContent='Merci de choisir au moins un article !';
+            modalContainer.classList.toggle("active");
+            timeoutId=setTimeout(() =>{
+                modalContainer.classList.toggle("active");
+            },5000)
+            return
         }
+        // je récupère les id des produits que je push dans un tableau. //v1
+        // let products = [];
+        // for (let i = 0; i<cart.length;i++) {
+        //     products.push(cart[i]._id);
+        // }
+        // let products = [];               //v2
+        // for(let product of cart) {
+        //     products.push(product._id)
+        // }
+        let products = cart.map(product => product._id)        //v3
+
+        
 
         // Je crée l'objet contact
     if(firstName && lastName && address && city && email) {
@@ -195,15 +287,11 @@ form.addEventListener('submit', (e) => {
             products
         }
 
-        // Je mémorise la réponse pour la gestion de la confirmation du panier
         sessionStorage.setItem('confirmation',JSON.stringify(confirmation));
-
-        // On clear le formulaire de saisie
+        // // On clear le formulaire de saisie
         inputs.forEach((input) => (input.value = ""));
-
-        // On appel la page de confirmation
+        
         document.location.href = "confirmation.html";
-        alert("Votre commande a bien été validée ! ")
     } 
 });
 
@@ -293,10 +381,7 @@ inputs.forEach((input) =>{
             case "email":
                 emailChecker(e.target.value)
             break;
-            default:
-                null;
+            default: null;
         };
     })
 });
-
-
