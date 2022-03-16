@@ -258,16 +258,8 @@ form.addEventListener('submit', (e) => {
             },5000)
             return
         }
-        // je récupère les id des produits que je push dans un tableau. //v1
-        // let products = [];
-        // for (let i = 0; i<cart.length;i++) {
-        //     products.push(cart[i]._id);
-        // }
-        // let products = [];               //v2
-        // for(let product of cart) {
-        //     products.push(product._id)
-        // }
-        let products = cart.map(product => product._id)        //v3
+        // je récupère les id des produits que je push dans un tableau.
+        let products = cart.map(product => product._id)  
 
         
 
