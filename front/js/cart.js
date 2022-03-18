@@ -56,42 +56,6 @@ if(cart===null || cart.length == 0){
     </article>
     `
     }).join("");
-
-    // for (let product of cart){
-
-    //     // cumul du prix pour le total de la commande
-    //     total += product.price * product.qty;
-    //     total_qty += parseInt(product.qty);
-    //     products.push(product);
-    
-    //     items.innerHTML += 
-    //     `
-    //     <article class="cart__item" data-id="${product._id}" data-color="${product.selectedColor}">
-    //         <div class="cart__item__img">
-    //             <img src="${product.imageUrl}" alt="${product.altTxt}">
-    //         </div
-    //         <div class="cart__item__content">
-    
-    //             <div class="cart__item__content__description">
-    //                 <h2>${product.name}</h2>
-    //                 <p>${product.selectedColor}</p>
-    //                 <p>${product.price} €</p>
-    //             </div>
-    
-    //             <div class="cart__item__content__settings">
-    //                 <div class="cart__item__content__settings__quantity">
-    //                     <p>Qté : </p>
-    //                     <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.qty}">
-    //                 </div>
-    //                 <div class="cart__item__content__settings__delete">
-    //                     <p class="deleteItem">Supprimer</p>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </article>
-    //     `
-    // }
-
 } // End Map
 
 
@@ -279,11 +243,23 @@ form.addEventListener('submit', (e) => {
             products
         }
 
-        sessionStorage.setItem('confirmation',JSON.stringify(confirmation));
+        // sessionStorage.setItem('confirmation',JSON.stringify(confirmation));
         // // On clear le formulaire de saisie
         inputs.forEach((input) => (input.value = ""));
         
-        document.location.href = "confirmation.html";
+        fetch("http://localhost:3000/api/products/order", {
+            method : "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body : JSON.stringify(confirmation)
+        })
+        .then((response) => response.json())
+        .then((validation) => {
+            sessionStorage.removeItem("cart");
+            document.location.href = `confirmation.html?orderId=${validation.orderId}`;
+        });
+
     } 
 });
 
