@@ -114,8 +114,8 @@ items.addEventListener('click', (e) => {
             store(products);    // On met à jour le sessionStorage
             new_qty=-res.qty;   // On récupère la quantité à supprimer du total
 
-            // On supprime la ligne de l'article dans l'affichage du panier
-            res.node.style.display='none';
+            // On supprime la ligne dans le DOM
+            res.node.remove(items);
 
             validAction=true;
 
